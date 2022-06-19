@@ -8,7 +8,7 @@ use crate::{
     primitives::DataType,
 };
 use key_tree::{KeyTree, KeyTreeError};
-use std::{convert::TryInto, ffi::OsStr, path::{Path, PathBuf}};
+use std::{convert::TryInto, ffi::OsStr, path::Path};
 
 /// Return the data-structures representing a filter specification.
 /// Return the data-structures representing a source specification.
@@ -182,7 +182,7 @@ mod test {
 
     #[test]
     fn read_spec_should_work() {
-        if let Ok(spec) = super::filter_spec_from_file(
+        if let Ok(_) = super::filter_spec_from_file(
             &PathBuf::from("filter.keytree"),
             &PathBuf::from("./test_contents")
         ) { 

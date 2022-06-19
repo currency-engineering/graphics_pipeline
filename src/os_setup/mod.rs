@@ -260,7 +260,6 @@ pub mod test {
         let s = r#"tcp   LISTEN 0      128        127.0.0.1:4444    0.0.0.0:*    users:(("geckodriver",pid=27563,fd=3))"#;
         let re = Regex::new(r#"^.*tcp.*LISTEN.*127.0.0.1:4444.*users:\(\(["][a-z].*",pid=([0-9]*),.*$"#).unwrap();
         assert!(re.is_match(s));
-        let captures = re.captures(s).unwrap();
         assert_eq!(
             re.captures(s)
                 .unwrap()
@@ -298,11 +297,10 @@ pub mod test {
         // Give shared_http time to connect to port
         thread::sleep(time::Duration::from_secs(1));
 
-        let v = pids_ports_cmds().unwrap();
         assert!(
             pids_ports_cmds().unwrap()
                 .iter()
-                .find(|(pid, port, cmd)| {
+                .find(|(_, port, cmd)| {
                     port == &Port(8080) &&
                     cmd == &Cmd::from("shared_http")
                 }).is_some()
@@ -315,7 +313,7 @@ pub mod test {
         assert!(
             pids_ports_cmds().unwrap()
                 .iter()
-                .find(|(pid, port, cmd)| {
+                .find(|(_, port, cmd)| {
                     port == &Port(8080) &&
                     cmd == &Cmd::from("shared_http")
                 }).is_none()
@@ -330,9 +328,9 @@ pub mod test {
         //
         match pids_ports_cmds().unwrap()
             .iter()
-            .find(|(pid, port, cmd)| (port == &Port(4444)) && (cmd == &Cmd::from("geckodriver")))
+            .find(|(_, port, cmd)| (port == &Port(4444)) && (cmd == &Cmd::from("geckodriver")))
         {
-            Some((pid, port, cmd)) => {
+            Some((_, _, _)) => {
 
                 // If geckodriver is already running
                 if let Ok(_) = start_geckodriver() {assert!(true)} else {assert!(false)}
@@ -361,7 +359,7 @@ pub mod test {
         assert!(
             pids_ports_cmds().unwrap()
                 .iter()
-                .find(|(pid, port, cmd)| (port == &Port(4444)) && (cmd == &Cmd::from("geckodriver")))
+                .find(|(_pid, port, cmd)| (port == &Port(4444)) && (cmd == &Cmd::from("geckodriver")))
                 .is_none()
         )
     }

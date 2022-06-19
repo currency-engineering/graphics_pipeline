@@ -1,7 +1,7 @@
 use crate::{
     countries::Country,
     primitives::{DataType, SeriesId},
-    series_spec::{SeriesSpec, SeriessSpec},
+    series_spec::{SeriesSpec},
 };
 
 use std::collections::BTreeMap;
@@ -84,7 +84,7 @@ pub mod test {
     use crate::countries::Country;
 
     #[test]
-    pub fn insert_should_work() {
+    fn insert_should_work() {
         let series_id = SeriesId::new("first");
 
         let input = SeriesSpec::new(
@@ -104,5 +104,8 @@ pub mod test {
      
     // How are they being ordered?
 
-
+    #[test]
+    fn more_tests_here() {
+        assert!(false)
+    }
 }
