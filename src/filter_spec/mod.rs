@@ -17,7 +17,7 @@ use std::{convert::TryInto, ffi::OsStr, path::{Path, PathBuf}};
 /// ```
 /// # use graphics_pipeline::filter_spec::filter_spec_from_file;
 ///
-/// let _ = filter_spec_from_file("../../shared_data", "filter_spec").unwrap();
+/// let _ = filter_spec_from_file("../../shared_data", "filter_spec.keytree").unwrap();
 /// ```
 pub fn filter_spec_from_file<S, P>(data_root: P, file: S) -> Result<FilterSpec>
 where
@@ -64,7 +64,7 @@ where
 ///               exclude:    55-64
 ///               exclude:    25-54
 ///               exclude:    15-24";
-/// # let _: FilterSpec = KeyTree::parse(s).unwrap().try_into().unwrap();
+/// # let _: FilterSpec = KeyTree::parse_str(s).unwrap().try_into().unwrap();
 /// ```
 pub struct FilterSpec(Vec<TagSelector>);
 
@@ -82,7 +82,9 @@ impl TryInto<FilterSpec> for KeyTree {
     type Error = KeyTreeError;
 
     fn try_into(self) -> std::result::Result<FilterSpec, Self::Error> {
+        dbg!();
         let v: Vec<TagSelector> = self.opt_vec_at("selectors::series")?;
+        dbg!();
         Ok(FilterSpec(v))
     }
 }
@@ -131,7 +133,7 @@ impl<'a> Iterator for FilterSpecIter<'a> {
 ///           exclude:    25-54
 ///           exclude:    55-64
 ///           require:    Rate";
-/// # let _: TagSelector = KeyTree::parse(s).unwrap().try_into().unwrap();
+/// # let _: TagSelector = KeyTree::parse_str(s).unwrap().try_into().unwrap();
 /// ```
 #[derive(Debug)]
 pub struct TagSelector {

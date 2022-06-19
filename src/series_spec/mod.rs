@@ -48,10 +48,10 @@ pub fn series_spec_from_file<P: AsRef<Path>>(data_root: P, file: P) -> Result<Se
 ///               country:            Australia
 ///               series_id:          AUSURANAA
 /// # "#;
-/// # let _: SeriesSpec = KeyTree::parse(s).unwrap().try_into().unwrap();
+/// # let _: SeriesSpec = KeyTree::parse_str(s).unwrap().try_into().unwrap();
 /// ```
 pub struct SeriesSpec {
-    pub (crate) series: Vec<Series>
+    pub(crate) series: Vec<Series>
 }
 
 impl TryInto<SeriesSpec> for KeyTree {
@@ -72,7 +72,7 @@ impl TryInto<SeriesSpec> for KeyTree {
 ///           country:            Australia
 ///           series_id:          AUSURAMS
 /// # "#;
-/// # let _: Series = KeyTree::parse(s).unwrap().try_into().unwrap();
+/// # let _: Series = KeyTree::parse_str(s).unwrap().try_into().unwrap();
 /// ```
 #[derive(Clone, Debug)]
 pub struct Series {

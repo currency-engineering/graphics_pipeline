@@ -38,7 +38,7 @@ use key_tree::{
 ///        seasonal_adjustment:    Not Seasonally Adjusted
 ///        notes:                  (see JSON data for notes)
 /// # ";
-/// #   let _: Series = KeyTree::parse(spec).unwrap().try_into().unwrap();
+/// #   let _: Series = KeyTree::parse_str(spec).unwrap().try_into().unwrap();
 /// ```
 #[derive(Debug)]
 pub struct Series {
