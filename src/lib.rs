@@ -22,9 +22,9 @@ pub mod primitives;
 pub mod series_spec;
 
 /// Use `series_spec.keytree` to write retrieve csv data from FRED and save to disk.  
-// pub mod series_to_disk;
+pub mod series_to_disk;
 
-// pub mod series_to_meta;
+pub mod series_to_meta;
 
 pub mod ts_graphics;
 

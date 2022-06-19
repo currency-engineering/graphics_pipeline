@@ -167,15 +167,15 @@ impl IntoResources for MetaData {
     }
 }
 
-// === FredDataSpec ===================================================================================
+// === Spec =======================================================================================
 
 #[derive(Debug)]
-pub struct FredDataSpec;
+pub struct Spec;
 
-impl IntoResources for FredDataSpec {
+impl IntoResources for Spec {
 
     fn dir<P: AsRef<Path>>(&self, data_root: P) -> Result<PathBuf> {
-        join_paths(data_root, vec!("fred_data", "spec"))
+        join_paths(data_root, vec!("specs"))
     }
 
     /// A collection of files of one type.
@@ -194,7 +194,7 @@ impl IntoResources for FredDataSpec {
                 continue;
             }
         
-            bail!("{} is not of type FredDataSpec", pb.display());
+            bail!("{} is not of type .keytree", pb.display());
         }
         Ok(acc.into_iter().collect())
     }
@@ -378,8 +378,8 @@ pub mod test {
     }
 
     #[test]
-    fn fred_data_spec_should_load() {
-        FredDataSpec.from_file("../../shared_data", "filter_spec.keytree").unwrap();
+    fn spec_should_load() {
+        Spec.from_file("../../shared_data", "filter_spec.keytree").unwrap();
     }
 
     #[test]
@@ -388,11 +388,11 @@ pub mod test {
     }
 
     #[test]
-    fn fred_data_spec_missing_file() {
-        if let Err(e) = FredDataSpec.from_file("../../shared_data", "missing") {
+    fn missing_file_should_error() {
+        if let Err(e) = Spec.from_file("../../shared_data", "missing") {
             assert_eq!(
                 e.to_string(),
-                "File 'missing' not found in '/home/eric/currency.engineering/shared_data/fred_data/spec'",
+                "File 'missing' not found in '/home/eric/currency.engineering/shared_data/specs'",
             );
         } else {
             assert!(false)

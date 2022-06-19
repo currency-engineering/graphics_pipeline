@@ -10,11 +10,9 @@ use crate::{
     primitives::SeriesId,
     filter_spec::FilterSpec, 
     filter_spec::TagSelector,
-    series_spec,
+    series_spec::{SeriesSpec, SeriessSpec},
     file_resources::IntoResources,
-    file_resources::impls::{
-        FredDataSpec,
-    },
+    file_resources::impls::Spec,
 };
 use fred_api::FredClient;
 use key_tree::KeyTree;
@@ -73,7 +71,7 @@ pub fn countries_with_data() -> Vec<Country> {
 ///       AUSURAMS Adjusted Unemployment Rate in Australia (DISCONTINUED)
 ///       AUSURANAA Adjusted Unemployment Rate for Adults in Australia (DISCONTINUED)
 /// ```
-pub fn series_spec_from_filter_spec<P, S>(file: S, root_data: P) -> Result<series_spec::SeriesSpec>
+pub fn series_spec_from_filter_spec<P, S>(file: S, root_data: P) -> Result<SeriessSpec>
 where
     P: AsRef<Path>,
     S: AsRef<OsStr>,
@@ -81,7 +79,7 @@ where
     let f: &OsStr = file.as_ref();
     let pb: PathBuf = root_data.as_ref().to_path_buf();
 
-    let path = FredDataSpec.dir(pb)?.join(f);
+    let path = Spec.dir(pb)?.join(f);
 
     let filter_spec: FilterSpec = KeyTree::parse(path)?.try_into()?;
 
@@ -102,12 +100,7 @@ where
 
             if is_selected(&tag_selector, series_item) {
                 println!("      {} {}", series_item.id, series_item.title);
-                let series = series_spec::Series {
-                    data_type:  tag_selector.data_type,
-                    country:    tag_selector.country,
-                    series_id:  series_id,
-                };
-                acc.push(series);
+                acc.push(SeriesSpec::new(tag_selector.data_type, tag_selector.country, series_id));
                 println!("      {} {}", series_item.id, series_item.title);
                 
             } else {
@@ -115,7 +108,7 @@ where
             }
         }
     }
-    Ok(series_spec::SeriesSpec { series: acc })
+    Ok(SeriessSpec { series: acc })
 }
 
     // /// Takes a [`FredSeriesFilter`](struct.FredSeriesFilter.html) and returns a [`SeriesSpecMap`](struct.SeriesSpecMap.html).

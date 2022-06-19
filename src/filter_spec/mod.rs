@@ -4,9 +4,7 @@ use anyhow::{anyhow, Result};
 use crate::{
     countries::Country,
     file_resources::IntoResources,
-    file_resources::impls::{
-        FredDataSpec,
-    },
+    file_resources::impls::Spec,
     primitives::DataType,
 };
 use key_tree::{KeyTree, KeyTreeError};
@@ -24,10 +22,8 @@ where
     S: AsRef<OsStr>,
     P: AsRef<Path>,
 {
-    let pb: PathBuf = data_root.as_ref().to_path_buf();
-    let f: &OsStr = file.as_ref();
-    let path = FredDataSpec.dir(pb)?.join(f);
-    KeyTree::parse(&path)?.try_into().map_err(|e: KeyTreeError| anyhow!(e.to_string()))
+    let path = Spec.full_path(data_root, file)?;
+    KeyTree::parse(&path)?.try_into().map_err(|_| anyhow!("File {} not found", path.display()))
 }
 
 // === FilterSpec =================================================================================
@@ -171,7 +167,7 @@ mod test {
         if let Err(e) = super::filter_spec_from_file("../../shared_data", "missing") {
             assert_eq!(
                 e.to_string(),
-                "File '/home/eric/currency.engineering/shared_data/fred_data/spec/missing' not found",
+                "File 'missing' not found in '/home/eric/currency.engineering/shared_data/specs'",
             );
         }
     }
@@ -180,7 +176,7 @@ mod test {
     fn read_spec_should_fail_if_contents_dir_missing() {
         if let Err(e) = super::filter_spec_from_file("../missing", "anything") {
             assert_eq!(
-                e.to_string(), "Directory '../missing/fred_data/spec' not found")
+                e.to_string(), "Directory '../missing/specs' not found")
         }
     }
 

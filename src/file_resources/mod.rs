@@ -71,6 +71,7 @@
 pub mod impls;
 
 use anyhow::{anyhow, bail, Result};
+use crate::file_resources::impls::Spec;
 use std::path::{Path, PathBuf};
 use std::{ffi::OsStr, fs};
 
@@ -232,7 +233,7 @@ pub trait IntoResources {
         match resources.iter().find(|pb| pb.ends_with(f)) {
             Some(found) => {
                 fs::read_to_string(&found)
-                    .map_err(|_| anyhow!( "File [{}] not found in [{}]", &found.to_str().unwrap(), dir.display()))
+                    .map_err(|_| anyhow!( "File '{}' not found in '{}'", &found.to_str().unwrap(), dir.display()))
             },
             None => {
                 Err(anyhow!("File '{}' not found in '{}'", f.to_str().unwrap(), dir.display()))
@@ -242,9 +243,9 @@ pub trait IntoResources {
 
     /// ```
     /// # use graphics_pipeline::file_resources::IntoResources;
-    /// # use graphics_pipeline::file_resources::impls::FredDataSpec;
+    /// # use graphics_pipeline::file_resources::impls::Spec;
     /// # use std::path::PathBuf;
-    /// let spec: PathBuf = FredDataSpec.full_path("../../shared_data", "series_spec.keytree").unwrap();
+    /// let spec: PathBuf = Spec.full_path("../../shared_data", "series_spec.keytree").unwrap();
     /// ```
    fn full_path<P, S>(&self, data_root: P, file: S) -> Result<PathBuf>
    where
