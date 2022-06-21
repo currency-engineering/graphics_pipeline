@@ -258,9 +258,8 @@ impl IntoResources for TSPageSpec {
     /// Build `Resources` for a GraphicsJs.
     /// ```
     /// # use graphics_pipeline::file_resources::IntoResources;
-    /// # use graphics_pipeline::file_resources::impls::PidGraphicsJs;
-    /// let js = PidGraphicsJs.into_resources("../../shared_data").unwrap();
-    /// // assert_eq!(js.into_iter().next().unwrap().extension().unwrap(), "js");
+    /// # use graphics_pipeline::file_resources::impls::TSPageSpec;
+    /// let _ = TSPageSpec.into_resources("../../shared_data").unwrap();
     /// ```
     fn into_resources<P: AsRef<Path>>(&self, data_root: P) -> Result<Resources> {
 
@@ -282,6 +281,9 @@ impl IntoResources for TSPageSpec {
     }
 }
 
+// === TSGraphicJs ========================================================================
+
+/// Javascript for plotting time-series graphics.
 pub struct TSGraphicsJs;
 
 impl IntoResources for TSGraphicsJs {
@@ -316,6 +318,64 @@ impl IntoResources for TSGraphicsJs {
         Ok(acc.into_iter().collect())
     }
 }
+
+// === TSHtmlTemplate =============================================================================
+
+/// HTML templates for making HTML web pages for displaying time-series graphics. 
+pub struct TSHtmlTemplate;
+
+impl IntoResources for TSHtmlTemplate {
+
+    fn dir<P: AsRef<Path>>(&self, data_root: P) -> Result<PathBuf> {
+        join_paths(data_root, vec!("ts_graphics", "templates"))
+    }
+
+    /// Build `Resources` for a GraphicsJs.
+    /// ```
+    /// # use graphics_pipeline::file_resources::IntoResources;
+    /// # use graphics_pipeline::file_resources::impls::TSGraphicsJs;
+    /// let js = TSGraphicsJs.into_resources("../../shared_data").unwrap();
+    /// // assert_eq!(js.into_iter().next().unwrap().extension().unwrap(), "js");
+    /// ```
+    fn into_resources<P: AsRef<Path>>(&self, data_root: P) -> Result<Resources> {
+
+        let dir = self.dir(data_root)?;
+
+        let mut acc = Vec::new();
+        for res_entry in std::fs::read_dir(&dir)? {
+            let entry = res_entry?;
+            let pb = entry.path();
+
+            if pb.extension() == Some("html".as_ref()) {
+                acc.push(pb);
+                continue;
+            }
+            // Reject all other file types.
+            bail!("{} is not a template", pb.display());
+        }
+        Ok(acc.into_iter().collect())
+    }
+}
+
+// === TSCss =============================================================================
+
+/// Style file for time-series graphics pages.
+pub struct TSCss;
+
+impl IntoResources for TSCss {
+
+    fn dir<P: AsRef<Path>>(&self, data_root: P) -> Result<PathBuf> {
+        join_paths(data_root, vec!("ts_graphics", "css"))
+    }
+
+    /// Takes a path to the root contents and returns the "style.css" file.
+    fn into_resources<P: AsRef<Path>>(&self, data_root: P) -> Result<Resources> {
+        let f = self.dir(data_root)?.join("style.css");
+        Ok(Resources(vec!(f)))
+    }
+}
+
+// === Tests ======================================================================================
 
 #[cfg(test)]
 pub mod test {

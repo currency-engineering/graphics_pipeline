@@ -55,7 +55,9 @@ impl fmt::Display for Cmd {
 
 // === helper functions ===========================================================================
 
+
 // Takes regex::byte::Regex captures and returns `String` for a given capture position. 
+#[allow(dead_code)]
 fn byte_capture(captures: &regex::bytes::Captures, pos: usize) -> Result<Option<String>> {
     let a_match = match captures.get(pos) {
         Some(mat) => mat,
@@ -70,6 +72,7 @@ fn byte_capture(captures: &regex::bytes::Captures, pos: usize) -> Result<Option<
 }
 
 // Takes regex::Regex captures and returns `String` for a given capture position.
+#[allow(dead_code)]
 fn capture(captures: &regex::Captures, pos: usize) -> Result<Option<String>> {
     let a_match = match captures.get(pos) {
         Some(mat) => mat,

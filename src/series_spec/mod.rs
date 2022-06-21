@@ -33,7 +33,10 @@ pub fn series_spec_from_file<P: AsRef<Path>>(data_root: P, file: P) -> Result<Se
 
 // impl SpecFromFile for SeriesSpec {}
 
-/// Deserialization of a series specification.
+// === SeriessSpec ================================================================================
+
+/// Represents a set of series as it moves through the graphics pipeline. It includes data on how
+/// to transforms.
 /// ```
 /// # use key_tree::KeyTree;
 /// # use graphics_pipeline::series_spec::SeriessSpec;
@@ -48,11 +51,20 @@ pub fn series_spec_from_file<P: AsRef<Path>>(data_root: P, file: P) -> Result<Se
 ///               country:            Australia
 ///               series_id:          AUSURANAA
 /// # "#;
-/// # let _: SeriessSpec = KeyTree::parse_str(s).unwrap().try_into().unwrap();
+/// let spec: SeriessSpec = KeyTree::parse_str(s).unwrap().try_into().unwrap();
 /// ```
 #[derive(Debug)]
 pub struct SeriessSpec {
     pub(crate) series: Vec<SeriesSpec>
+}
+
+impl SeriessSpec {
+    pub(crate) fn iter(&self) -> SeriessSpecIter {
+        SeriessSpecIter {
+            data: &self,
+            count: 0,
+        }
+    }
 }
 
 impl TryInto<SeriessSpec> for KeyTree {
@@ -62,6 +74,28 @@ impl TryInto<SeriessSpec> for KeyTree {
         Ok(SeriessSpec { series: self.opt_vec_at("seriess::series")? })
     }
 }
+
+// === SeriessSpecIter ============================================================================
+
+pub struct SeriessSpecIter<'a> {
+    data: &'a SeriessSpec,
+    count: usize,
+}
+
+impl<'a> Iterator for SeriessSpecIter<'a> {
+    type Item = SeriesSpec;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.count >= self.data.series.len() {
+            return None
+        } else {
+            self.count += 1;
+            return Some(self.data.series[self.count - 1].clone())
+        }
+    }
+}
+
+// === SeriessSpec ================================================================================
 
 /// A component of [`SeriesSpec`](struct.SeriesSpec.html].
 /// ```
@@ -75,7 +109,7 @@ impl TryInto<SeriessSpec> for KeyTree {
 /// # "#;
 /// # let _: SeriesSpec = KeyTree::parse_str(s).unwrap().try_into().unwrap();
 /// ```
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct SeriesSpec {
     data_type:   DataType,
     country:     Country,
@@ -104,7 +138,6 @@ impl SeriesSpec {
     }
 }
 
-
 /// ```text
 /// seriess:
 ///     series:
@@ -124,5 +157,33 @@ impl TryInto<SeriesSpec> for KeyTree {
                 series_id:  self.from_str("series::series_id")?,
             }
         )
+    }
+}
+
+#[cfg(test)]
+pub mod test {
+
+    use key_tree::KeyTree;
+    use crate::series_spec::SeriessSpec;
+
+    #[test]
+    fn spec_from_keytree_should_work() {
+
+        let s = r#"
+            seriess:
+                series:
+                    data_type:          u
+                    country:            Australia
+                    series_id:          AUSURAMS
+                series:
+                    data_type:          u
+                    country:            Australia
+                    series_id:          AUSURANAA
+        "#;
+        dbg!(KeyTree::parse_str(s).unwrap());
+        let spec: SeriessSpec = KeyTree::parse_str(s).unwrap().try_into().unwrap();
+        let mut iter = spec.iter();
+        assert!(iter.next().is_some());
+        assert!(iter.next().is_some());
     }
 }

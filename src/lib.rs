@@ -6,7 +6,7 @@ pub mod filter_spec;
 pub mod filter_to_series;
 
 /// Implement actix web data for html. 
-// pub mod html_to_server;
+pub mod html;
 
 pub mod http_state;
 
@@ -31,3 +31,4 @@ pub mod ts_graphics;
 pub mod ui_spec;
 
 // pub mod ui_to_server;
+
